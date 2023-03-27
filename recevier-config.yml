@@ -1,0 +1,5 @@
+receiver:
+  # 暴露Grpc端口号
+  port: 29090
+  # 设置TraceId缓存时间，单位为秒.
+  traceid_cache_time: 6
