@@ -1,6 +1,6 @@
 package config
 
 type Config struct {
-	Port             int `yaml:"port,omitempty"`
-	TraceIdCacheTime int `yaml:"traceid_cache_time,omitempty"`
+	Port             int `mapstructure:"port"`
+	TraceIdCacheTime int `mapstructure:"traceid_cache_time"`
 }

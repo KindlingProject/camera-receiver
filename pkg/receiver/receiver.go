@@ -47,6 +47,7 @@ func startGrpcServer(config *config.Config) error {
 
 	server := grpc.NewServer()
 	// TraceId 接口
+	log.Printf("Start TraceId Cache Time: %d", config.TraceIdCacheTime)
 	traceIdServer := traceid.NewTraceIdServer(config.TraceIdCacheTime)
 	model.RegisterTraceIdServiceServer(server, traceIdServer)
 

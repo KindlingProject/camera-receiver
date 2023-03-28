@@ -1,6 +1,7 @@
 package traceid
 
 import (
+	"log"
 	"sync"
 	"time"
 
@@ -21,6 +22,8 @@ func NewTraceIdCache(timeout int) *traceIdCache {
 func (cache *traceIdCache) cacheTraceId(traceId string) {
 	// 保留第一条TraceId 时间，减少TraceId数据被接口重复获取.
 	cache.traceIds.LoadOrStore(traceId, time.Now().UnixNano())
+
+	log.Printf("Cache TraceId: %s", traceId)
 }
 
 func (cache *traceIdCache) cleanCache() {
@@ -31,9 +34,12 @@ func (cache *traceIdCache) cleanCache() {
 			now := time.Now().UnixNano()
 			cache.traceIds.Range(func(k, v any) bool {
 				time := v.(int64)
+				log.Printf("Now:%d, time: %d, Timeout: %d", now, time, cache.timeout)
 				if now-time > cache.timeout {
 					// 每秒钟清除已失效TraceId记录
 					cache.traceIds.Delete(k)
+
+					log.Printf("Clean TraceId: %v", k)
 				}
 				return true
 			})
@@ -60,6 +66,8 @@ func (cache *traceIdCache) getTraceIds(ignoreTraces map[string]bool, startTime i
 		}
 		return true
 	})
+
+	log.Printf("Found TraceIds: %v", traceIds)
 	return &model.TraceIds{
 		QueryTime: lastTime,
 		TraceIds:  traceIds,
