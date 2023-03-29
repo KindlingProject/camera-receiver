@@ -1,13 +1,14 @@
-FROM golang:1.20.2
-
-WORKDIR /usr/src/app
-
+FROM golang:1.20.2-bullseye AS builder
+WORKDIR /build
 ENV GOPROXY https://goproxy.cn
 COPY go.mod go.sum ./
 RUN go mod download && go mod verify
 
 COPY . .
-RUN go build -v -o /usr/local/bin/camera-receiver ./cmd
-COPY receiver-config.yml /etc/config/
+RUN go build -v -o camera-receiver ./cmd
 
-CMD ["camera-receiver", "--config=/etc/config/receiver-config.yml"]
+FROM debian:bullseye-slim AS runner
+WORKDIR /app
+COPY receiver-config.yml /app/
+COPY --from=builder /build/camera-receiver /app/
+CMD ["/app/camera-receiver", "--config=/app/receiver-config.yml"]
