@@ -76,6 +76,7 @@ func (cache *prometheusP9xCache) updateP9xByPromethues() {
 		cacheResponse *model.P9XResponse
 		exist         bool
 	)
+	count := 0
 	if vector, ok := result.(prometheus_model.Vector); ok {
 		for _, sample := range vector {
 			instance := string(sample.Metric[Instance])
@@ -85,15 +86,18 @@ func (cache *prometheusP9xCache) updateP9xByPromethues() {
 				}
 				p9xCache[instance] = cacheResponse
 			}
-			cacheResponse.Datas = append(cacheResponse.Datas, &model.P9XData{
-				Url:         string(sample.Metric[ContentKey]),
-				ContainerId: string(sample.Metric[ContainerId]),
-				Value:       float64(sample.Value),
-			})
+			if float64(sample.Value) > 0 {
+				count++
+				cacheResponse.Datas = append(cacheResponse.Datas, &model.P9XData{
+					Url:         string(sample.Metric[ContentKey]),
+					ContainerId: string(sample.Metric[ContainerId]),
+					Value:       float64(sample.Value),
+				})
+			}
 		}
 	}
-	log.Printf("Receive [P9x] Count: %d\n", len(p9xCache))
-	if len(p9xCache) > 0 {
+	log.Printf("Receive [P9x] Count: %d, Group: %d\n", count, len(p9xCache))
+	if count > 0 {
 		cache.p9xCache = p9xCache
 	}
 }
