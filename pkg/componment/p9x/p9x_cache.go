@@ -3,6 +3,7 @@ package p9x
 import (
 	"context"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -42,6 +43,7 @@ func NewPrometheusP9xCache(address string, p9xValue float32, outputName string, 
 }
 
 func (cache *prometheusP9xCache) queryP9xByPromethues(interval int) {
+	log.Printf("QueryP9x with Promethus in %d second.", interval)
 	timer := time.NewTicker(time.Duration(interval) * time.Second)
 	for {
 		select {
@@ -56,17 +58,17 @@ func (cache *prometheusP9xCache) updateP9xByPromethues() {
 		Address: cache.prometheusAddress,
 	})
 	if err != nil {
-		fmt.Errorf("NewClient for Promethues failed: %v", err)
+		log.Fatalf("NewClient for Promethues failed: %v", err)
 		return
 	}
 	v1Api := v1.NewAPI(client)
 	result, warnings, err := v1Api.Query(context.Background(), cache.query, time.Now())
 	if err != nil {
-		fmt.Errorf("Request Prometheus P9x failed: %v", err)
+		log.Fatalf("Request Prometheus P9x failed: %v", err)
 		return
 	}
 	if len(warnings) > 0 {
-		fmt.Printf("Request Prometheus Warning: %s", warnings)
+		log.Printf("Request Prometheus Warning: %s", warnings)
 	}
 
 	p9xCache := make(map[string]*model.P9XResponse)
@@ -90,7 +92,7 @@ func (cache *prometheusP9xCache) updateP9xByPromethues() {
 			})
 		}
 	}
-	fmt.Printf("Receive [P9x] Count: %d\n", len(p9xCache))
+	log.Printf("Receive [P9x] Count: %d\n", len(p9xCache))
 	if len(p9xCache) > 0 {
 		cache.p9xCache = p9xCache
 	}

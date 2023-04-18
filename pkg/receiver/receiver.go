@@ -56,6 +56,7 @@ func startGrpcServer(receiverCfg *config.ReceiverConfig, prometheusCfg *config.P
 	model.RegisterTraceIdServiceServer(server, traceIdServer)
 	traceIdServer.Start()
 
+	log.Printf("Start P9x Address: %s", prometheusCfg.Address)
 	p9xServer := p9x.NewP9XServer(prometheusCfg)
 	model.RegisterP9XServiceServer(server, p9xServer)
 	p9xServer.Start()
