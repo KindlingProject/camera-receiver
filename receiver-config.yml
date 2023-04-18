@@ -3,3 +3,14 @@ receiver:
   port: 29090
   # 设置TraceId缓存时间，单位为秒.
   traceid_cache_time: 6
+
+promethues:
+  address: "http://127.0.0.1:9090"
+  # 设置查询间隔(秒).
+  query_interval: 10
+  # 设置查询P9x值.
+  query_p9x_val: 0.9
+  # 设置查询表名.
+  query_p9x_table: "kindling_span_trace_duration_nanoseconds_bucket"
+  # 设置查询时间段.
+  query_p9x_duration: "1d"
